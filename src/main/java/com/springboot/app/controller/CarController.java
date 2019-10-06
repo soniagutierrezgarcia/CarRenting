@@ -27,9 +27,7 @@ import com.springboot.app.model.Car;
 import com.springboot.app.model.Rent;
 import com.springboot.app.service.CarService;
 
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @RestController
 @RequestMapping("/cars")
 public class CarController {
@@ -77,7 +75,7 @@ public class CarController {
 	public ResponseEntity<CarProfitDto> getProfit(@PathVariable("id") Integer idCar,
 			@PathVariable("start")  @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate, 
 			@PathVariable(value = "end", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate){
-		log.info("This is a DEBUG log" + endDate);
+
 		if (endDate == null)
 			endDate = LocalDate.now();
 		CarProfitDto carProfit = new CarProfitDto();   
