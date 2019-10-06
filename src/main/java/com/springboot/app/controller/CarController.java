@@ -27,6 +27,9 @@ import com.springboot.app.model.Car;
 import com.springboot.app.model.Rent;
 import com.springboot.app.service.CarService;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @RestController
 @RequestMapping("/cars")
 public class CarController {
@@ -69,21 +72,14 @@ public class CarController {
 		return new ResponseEntity<>(carService.getRents(idCar, pageable), HttpStatus.OK);
 	}
 
-	/*
-	@GetMapping("/{id}/rents/{start}/{end}")
-	public ResponseEntity<Double> getProfit(@PathVariable("id") Integer idCar,
-			@PathVariable("start")  @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate, 
-			@PathVariable("end")   @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate){
-		return new ResponseEntity<ResponseData>(new ResponseData(carService.title(idCar)
-				+ carService.getProfitByDateRange(idCar, startDate, endDate)), HttpStatus.OK);
-	}
-	*/
-	
-	@GetMapping("/{id}/rents/{start}/{end}")
+
+	@GetMapping({"/{id}/rents/{start}/{end}", "/{id}/rents/{start}"})
 	public ResponseEntity<CarProfitDto> getProfit(@PathVariable("id") Integer idCar,
 			@PathVariable("start")  @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate, 
-			@PathVariable("end")   @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate){
-		
+			@PathVariable(value = "end", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate){
+		log.info("This is a DEBUG log" + endDate);
+		if (endDate == null)
+			endDate = LocalDate.now();
 		CarProfitDto carProfit = new CarProfitDto();   
 		carProfit.setTitle(carService.getById(idCar).getBrand() + " " + carService.getById(idCar).getModel());
 		carProfit.setPrice(carService.getProfitByDateRange(idCar, startDate, endDate));

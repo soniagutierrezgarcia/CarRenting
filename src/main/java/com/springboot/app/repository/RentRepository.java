@@ -27,5 +27,5 @@ public interface RentRepository extends JpaRepository<Rent, Integer> {
 
 	List<Rent> findByCar(Car car);
 
-	List<Rent> findByCarAndStartDateAndEndDate(Car car, LocalDate startDate, LocalDate endDate);
+	List<Rent> findByCarAndStartDateGreaterThanEqualAndEndDateLessThanEqual(Car car, LocalDate startDate, LocalDate endDate);
 }

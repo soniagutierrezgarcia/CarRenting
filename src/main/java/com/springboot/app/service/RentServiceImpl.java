@@ -72,7 +72,7 @@ public class RentServiceImpl implements RentService {
 
 	@Override
 	public List<Rent> getByCarAndDateRange(Car car, LocalDate start, LocalDate end) {
-		return rentRepository.findByCarAndStartDateAndEndDate(car, start, end);
+		return rentRepository.findByCarAndStartDateGreaterThanEqualAndEndDateLessThanEqual(car, start, end);
 	}
 
 }
