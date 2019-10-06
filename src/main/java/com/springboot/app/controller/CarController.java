@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.springboot.app.dto.CarDto;
-import com.springboot.app.exception.NotFoundException;
+import com.springboot.app.dto.CarProfitDto;
 import com.springboot.app.mapper.MapperService;
 import com.springboot.app.model.Car;
 import com.springboot.app.model.Rent;
@@ -68,11 +69,26 @@ public class CarController {
 		return new ResponseEntity<>(carService.getRents(idCar, pageable), HttpStatus.OK);
 	}
 
+	/*
 	@GetMapping("/{id}/rents/{start}/{end}")
 	public ResponseEntity<Double> getProfit(@PathVariable("id") Integer idCar,
-			@PathVariable("start") LocalDate startDate, @PathVariable("end") LocalDate endDate)
-			throws NotFoundException {
-		return new ResponseEntity<>(carService.getProfitByDateRange(idCar, startDate, endDate), HttpStatus.OK);
+			@PathVariable("start")  @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate, 
+			@PathVariable("end")   @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate){
+		return new ResponseEntity<ResponseData>(new ResponseData(carService.title(idCar)
+				+ carService.getProfitByDateRange(idCar, startDate, endDate)), HttpStatus.OK);
+	}
+	*/
+	
+	@GetMapping("/{id}/rents/{start}/{end}")
+	public ResponseEntity<CarProfitDto> getProfit(@PathVariable("id") Integer idCar,
+			@PathVariable("start")  @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate, 
+			@PathVariable("end")   @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate){
+		
+		CarProfitDto carProfit = new CarProfitDto();   
+		carProfit.setTitle(carService.getById(idCar).getBrand() + " " + carService.getById(idCar).getModel());
+		carProfit.setPrice(carService.getProfitByDateRange(idCar, startDate, endDate));
+		
+		return new ResponseEntity<CarProfitDto>(carProfit, HttpStatus.OK);
 	}
 
 }

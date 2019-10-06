@@ -79,4 +79,5 @@ public interface CarService {
 	 * @throws NotFoundException
 	 */
 	double getProfitByDateRange(Integer id, LocalDate startDate, LocalDate endDate) throws NotFoundException;
+	
 }

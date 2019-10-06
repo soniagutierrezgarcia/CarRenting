@@ -1,5 +1,6 @@
 package com.springboot.app.service;
 
+
 import java.time.LocalDate;
 
 /**
@@ -88,10 +89,10 @@ public interface RentService {
 	 * Get all rent of car in a range of dates on list
 	 * 
 	 * @param car
-	 * @param start
-	 * @param end
+	 * @param startDate
+	 * @param endDate
 	 * @return
 	 */
-	List<Rent> getByCarAndDateRange(Car car, LocalDate start, LocalDate end);
+	List<Rent> getByCarAndDateRange(Car car, LocalDate startDate, LocalDate endDate);
 
 }
