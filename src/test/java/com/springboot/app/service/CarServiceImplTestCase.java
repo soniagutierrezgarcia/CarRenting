@@ -27,7 +27,6 @@ import com.springboot.app.model.Car;
 import com.springboot.app.model.Rent;
 import com.springboot.app.model.User;
 import com.springboot.app.repository.CarRepository;
-import com.springboot.app.repository.RentRepository;
 
 
 /**
@@ -51,9 +50,6 @@ public class CarServiceImplTestCase {
 	 */
 	@Mock 
 	private CarRepository carRepository;
-	
-	@Mock 
-	private RentRepository rentRepository;
 	
 	@Mock 
 	private RentService rentService;
@@ -129,7 +125,7 @@ public class CarServiceImplTestCase {
 	}
 	
 	@Test(expected = NotFoundException.class)
-    public void deleteWhenPersonIsNotFound() throws NotFoundException {
+    public void deleteWhenCarIsNotFound() throws NotFoundException {
 		carService.delete(0);
     }
 
@@ -148,7 +144,7 @@ public class CarServiceImplTestCase {
 	}
 	
 	@Test(expected = NotFoundException.class)
-    public void updateWhenPersonIsNotFound() throws NotFoundException {
+    public void updateWhenCarIsNotFound() throws NotFoundException {
 		carService.update(0, null);
     }
 
