@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.validator.constraints.ScriptAssert;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -17,6 +18,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonPropertyOrder(value = { "id", "user", "car", "startDate", "endDate", "price" })
+@ScriptAssert(lang = "javascript", script = "_.startDate <= _.endDate", alias = "_", message = "date of death cannot be before date of birth")
 public class RentDto {
 
 	private Integer id;

@@ -1,8 +1,11 @@
 package com.springboot.app.service;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +24,8 @@ import org.springframework.data.domain.Pageable;
 
 import com.springboot.app.exception.NotFoundException;
 import com.springboot.app.model.Car;
+import com.springboot.app.model.Rent;
+import com.springboot.app.model.User;
 import com.springboot.app.repository.CarRepository;
 import com.springboot.app.repository.RentRepository;
 
@@ -32,7 +37,7 @@ import com.springboot.app.repository.RentRepository;
  */
 @RunWith(MockitoJUnitRunner.class)
 @SpringBootTest
-public class TestCarService {
+public class UserServiceImplTestCase {
 	
 	/*
 	 * @InjectMocks creates the mock implementation, 
@@ -49,6 +54,9 @@ public class TestCarService {
 	
 	@Mock 
 	private RentRepository rentRepository;
+	
+	@Mock 
+	private RentService rentService;
 
     @Before
     public void init() {
@@ -115,27 +123,14 @@ public class TestCarService {
 	 */
 	@Test
 	public void testDelete() throws NotFoundException{
-		
-		final Car car = new Car(1,"Model 1","Brand 1");
-        Mockito.when(carRepository.findById(1).get()).thenReturn(car);
-
-        // when
-        carService.delete(car.getId()) ;
-
-        // then
-        Mockito.verify(carRepository, times(1)).delete(car);
-        verifyNoMoreInteractions(carRepository);  
+        when(carRepository.existsById(1)).thenReturn(true);
+        carService.delete(1);
+        Mockito.verify(carRepository, times(1)).deleteById(1);
 	}
 	
 	@Test(expected = NotFoundException.class)
     public void deleteWhenPersonIsNotFound() throws NotFoundException {
-		
-        when(carRepository.findById(1)).thenReturn(null);
-        
-        carService.delete(1);
-        
-        verify(carRepository, times(1)).findById(1);
-        verifyNoMoreInteractions(carRepository);
+		carService.delete(0);
     }
 
 	/**
@@ -143,8 +138,52 @@ public class TestCarService {
 	 */
 	@Test
 	public void testUpdate() throws NotFoundException {
-		fail("Not yet implemented");
-	}
+		Car car = mock(Car.class);
+        when(carRepository.existsById(1)).thenReturn(true);
+    
+		carService.update(1, car);
+        Mockito.verify(car, times(1)).setId(1);
+        Mockito.verify(carRepository, times(1)).save(car);
 
+	}
+	
+	@Test(expected = NotFoundException.class)
+    public void updateWhenPersonIsNotFound() throws NotFoundException {
+		carService.update(0, null);
+    }
+
+	
+	@Test
+	public void testGetRents() {
+		Car carFind = new Car(1,"Model 1","Brand 1");
+		Pageable pageable = mock(Pageable.class);
+		
+        when(carRepository.findById(1)).thenReturn(Optional.of(carFind));
+        carService.getRents(1, pageable);
+        Mockito.verify(rentService, times(1)).getByCar(pageable, carFind);
+ 
+	}
+	
+	@Test
+	public void testGetProfitByDateRange() {
+		Car carFind = new Car(1,"Model 1","Brand 1");
+		LocalDate starDate = LocalDate.of(2019, 02, 01);
+		LocalDate endDate = LocalDate.of(2019, 02, 01);
+		User user = new User(1, "User 1");
+		Rent rent = new Rent(1, user, carFind, starDate, endDate, 100.0);
+		Rent rent2 = new Rent(2, user, carFind, starDate, endDate, 50.0);
+		
+        when(carRepository.findById(1)).thenReturn(Optional.of(carFind));
+        when(rentService.getByCarAndDateRange(carFind, starDate, endDate)).thenReturn(Arrays.asList(rent, rent2));
+	
+        double price = carService.getProfitByDateRange(1,starDate , endDate);
+        
+        Mockito.verify(rentService, times(1)).getByCarAndDateRange(carFind, starDate, endDate);
+        
+        assertThat("Profit is 150.0", price, is(equalTo(150.0)));
+	
+	}
+	
+	
 
 }
