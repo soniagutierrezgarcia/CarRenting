@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonPropertyOrder(value = { "id", "user", "car", "startDate", "endDate", "price" })
-@ScriptAssert(lang = "javascript", script = "_.startDate <= _.endDate", alias = "_", message = "date of death cannot be before date of birth")
+@ScriptAssert(lang = "javascript", script = "_.startDate <= _.endDate", alias = "_", message = "date of end rent cannot be before date of start rent")
 public class RentDto {
 
 	private Integer id;
