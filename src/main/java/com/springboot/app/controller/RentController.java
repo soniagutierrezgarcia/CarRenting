@@ -29,60 +29,26 @@ public class RentController {
 	private MapperService<RentDto, Rent> mapper;
 
 	@GetMapping("/{id}")
-	public ResponseEntity<RentDto> getCar(@PathVariable("id") Integer idRent) {
+	public ResponseEntity<RentDto> getRent(@PathVariable("id") Integer idRent) {
 		return ResponseEntity.ok().body(mapper.mapToDto(rentService.getById(idRent)));
 	}
 
 	@PostMapping
-	public ResponseEntity<RentDto> createCar(@Valid @RequestBody RentDto rentDto) {
+	public ResponseEntity<RentDto> createRent(@Valid @RequestBody RentDto rentDto) {
 		return new ResponseEntity<RentDto>(mapper.mapToDto(rentService.create(mapper.mapToEntity(rentDto))),
 				HttpStatus.ACCEPTED);
 	}
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> deleteCar(@PathVariable("id") Integer idRent) {
+	public ResponseEntity<Void> deleteRent(@PathVariable("id") Integer idRent) {
 		rentService.delete(idRent);
 		return ResponseEntity.ok().build();
 	}
-	/*
-	 * @GetMapping("") public ResponseEntity<Page<RentDto>>
-	 * getAllCar(@PageableDefault(page = 0, value = 10) Pageable pageable) { return
-	 * new ResponseEntity<Page<RentDto>>(mapper.mapPageToDto(rentService.getPage(
-	 * pageable)), HttpStatus.OK); }
-	 */
 
 	@PutMapping("/{id}")
-	public ResponseEntity<RentDto> putCar(@PathVariable("id") Integer idCar, @Valid @RequestBody RentDto carDto) {
+	public ResponseEntity<RentDto> putRent(@PathVariable("id") Integer idCar, @Valid @RequestBody RentDto carDto) {
 		return new ResponseEntity<RentDto>(mapper.mapToDto(rentService.update(idCar, mapper.mapToEntity(carDto))),
 				HttpStatus.OK);
 	}
-	/*
-	 * @GetMapping("/{id}/users") public ResponseEntity<Page<Rent>>
-	 * getRents(@PathVariable("id") Integer idCar, Pageable pageable) { return new
-	 * ResponseEntity<>(rentService.getRents(idCar, pageable), HttpStatus.OK); }
-	 * 
-	 * 
-	 * @PathVariable("idCar") Integer idCar, @Valid @RequestBody RentDto rentDto)
-	 * throws NotFoundException { return new
-	 * ResponseEntity<RentDto>(mapper.mapToDto(rentService.createRentService(idUser,
-	 * idCar, rentDto)), HttpStatus.OK); }
-	 * 
-	 * @GetMapping public ResponseEntity<Page<RentDto>>
-	 * getAllRent(@PathVariable("idUser") Integer idUser,
-	 * 
-	 * @PathVariable("idCar") Integer idCar, @PageableDefault(page = 0, value = 10)
-	 * Pageable pageable) { return new
-	 * ResponseEntity<>(mapper.mapPageToDto(rentService.getAllRentService(idUser,
-	 * idCar, pageable)), HttpStatus.OK); }
-	 * 
-	 * @DeleteMapping("/{idRent}") public ResponseEntity<?>
-	 * deleteRent(@PathVariable("idRent") Integer idRent) throws NotFoundException {
-	 * rentService.deleteRentService(idRent); return ResponseEntity.ok().build(); }
-	 * 
-	 * @PutMapping("/{idRent}") public ResponseEntity<RentDto>
-	 * putRent(@PathVariable("idRent") Integer idRent, @Valid @RequestBody RentDto
-	 * rentDto) throws NotFoundException, DateFormatNoValidException { return new
-	 * ResponseEntity<>(mapper.mapToDto(rentService.updateRentService(idRent,
-	 * rentDto)), HttpStatus.OK); }
-	 */
+
 }

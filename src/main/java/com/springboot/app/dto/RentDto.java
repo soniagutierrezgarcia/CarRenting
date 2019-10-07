@@ -3,8 +3,9 @@ package com.springboot.app.dto;
 import java.time.LocalDate;
 
 import javax.validation.constraints.Digits;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+
+import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
@@ -24,12 +25,12 @@ public class RentDto {
 
 	private CarDto car;
 
-	@NotNull(message = "{rent.car.date.start.notnull}")
-	@NotBlank(message = "{rent.car.date.start.notblank}")
+	@NotNull
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private LocalDate startDate;
 
-	@NotNull(message = "{rent.car.date.start.notnull}")
-	@NotBlank(message = "{rent.car.date.start.notblank}")
+	@NotNull
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private LocalDate endDate;
 
 	@Digits(integer = 10, fraction = 2)
