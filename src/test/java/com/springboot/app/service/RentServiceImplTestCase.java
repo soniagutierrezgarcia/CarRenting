@@ -7,6 +7,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.Before;
@@ -18,6 +20,9 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import com.springboot.app.exception.NotFoundException;
 import com.springboot.app.model.Car;
@@ -108,28 +113,108 @@ public class RentServiceImplTestCase {
     }
 
 	@Test
-	public void testGetByUserPageableUser() {
-		fail("Not yet implemented");
+	public void testGetByUserPageableUser() {        
+		Car carFind = new Car(1,"Model 1","Brand 1");
+		LocalDate starDate = LocalDate.of(2019, 02, 01);
+		LocalDate endDate = LocalDate.of(2019, 02, 01);
+		User user = new User(1, "User 1");
+		
+		when(rentRepository.findByUser(user)).thenReturn(Arrays.asList(
+				new Rent(1, user, carFind, starDate, endDate, 100.0),
+				new Rent(2, user, carFind, starDate, endDate, 200.0),
+				new Rent(3, user, carFind, starDate, endDate, 300.0),
+				new Rent(4, user, carFind, starDate, endDate, 400.0)
+    ));
+
+    Pageable pageRequest = PageRequest.of(0, 4);
+    Page<Rent> rents = rentService.getByUser(pageRequest, user);
+
+    assertEquals(rents.getTotalElements(), 4);
+
+    verify(rentRepository).findByUser(user);
+    
 	}
 
 	@Test
 	public void testGetByUserUser() {
-		fail("Not yet implemented");
+		Car car = new Car(1,"Model 1","Brand 1");
+		LocalDate starDate = LocalDate.of(2019, 02, 01);
+		LocalDate endDate = LocalDate.of(2019, 02, 01);
+		User user = new User(1, "User 1");
+		
+		when(rentRepository.findByUser(user)).thenReturn(Arrays.asList(
+				new Rent(1, user, car, starDate, endDate, 100.0),
+				new Rent(2, user, car, starDate, endDate, 200.0),
+				new Rent(3, user, car, starDate, endDate, 300.0),
+				new Rent(4, user, car, starDate, endDate, 400.0)
+    ));
+
+    List<Rent> rents = rentService.getByUser(user);
+
+    assertEquals(rents.size(), 4);
+
+    verify(rentRepository).findByUser(user);
 	}
+
 
 	@Test
 	public void testGetByCarPageableCar() {
-		fail("Not yet implemented");
+		Car car = new Car(1,"Model 1","Brand 1");
+		LocalDate starDate = LocalDate.of(2019, 02, 01);
+		LocalDate endDate = LocalDate.of(2019, 02, 01);
+		User user = new User(1, "User 1");
+		
+		when(rentRepository.findByCar(car)).thenReturn(Arrays.asList(
+				new Rent(1, user, car, starDate, endDate, 100.0),
+				new Rent(2, user, car, starDate, endDate, 200.0),
+				new Rent(3, user, car, starDate, endDate, 300.0),
+				new Rent(4, user, car, starDate, endDate, 400.0)
+    ));
+
+    Pageable pageRequest = PageRequest.of(0, 4);
+    Page<Rent> rents = rentService.getByCar(pageRequest, car);
+
+    assertEquals(rents.getTotalElements(), 4);
+
+    verify(rentRepository).findByCar(car);
 	}
 
 	@Test
 	public void testGetByCarCar() {
-		fail("Not yet implemented");
+		Car car = new Car(1,"Model 1","Brand 1");
+		LocalDate starDate = LocalDate.of(2019, 02, 01);
+		LocalDate endDate = LocalDate.of(2019, 02, 01);
+		User user = new User(1, "User 1");
+		Rent rent1 = new Rent(1, user, car, starDate, endDate, 100.0);
+		Rent rent2 = new Rent(2, user, car, starDate, endDate, 50.0);
+		
+		when(rentRepository.findByCar(car)).thenReturn(Arrays.asList(rent1,rent2));
+
+    List<Rent> rents = rentService.getByCar(car);
+
+    assertEquals(rents.size(), 4);
+
+    verify(rentRepository).findByCar(car);
 	}
 
 	@Test
-	public void testGetByCarAndDateRange() {
-		fail("Not yet implemented");
+	public void testGetByCarAndDateRange() { 
+		
+		Car car = new Car(1,"Model 1","Brand 1");
+		LocalDate starDate = LocalDate.of(2019, 02, 01);
+		LocalDate endDate = LocalDate.of(2019, 02, 01);
+		User user = new User(1, "User 1");
+		Rent rent = new Rent(1, user, car, starDate, endDate, 100.0);
+		Rent rent2 = new Rent(2, user, car, starDate, endDate, 50.0);
+		
+        when(rentRepository.findById(1)).thenReturn(Optional.of(rent));
+        when(rentRepository.findByCarAndStartDateGreaterThanEqualAndEndDateLessThanEqual(car, starDate, endDate)).thenReturn(Arrays.asList(rent, rent2));
+	
+        List<Rent> rents = rentService.getByCarAndDateRange(car,starDate , endDate);
+        
+        Mockito.verify(rentService, times(1)).getByCarAndDateRange(car, starDate, endDate);
+        
+        assertEquals(rents.size(), 2);
 	}
 
 }

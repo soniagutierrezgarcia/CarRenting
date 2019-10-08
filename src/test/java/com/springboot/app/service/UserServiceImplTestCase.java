@@ -1,5 +1,6 @@
 package com.springboot.app.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -7,7 +8,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import org.junit.Before;
@@ -19,6 +19,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
@@ -99,17 +100,18 @@ public class UserServiceImplTestCase {
 
 	@Test
 	public void testGetPage() {
-        when(userRepository.findAll()).thenReturn(Arrays.asList(
-                new User(1,"Name 1"),
-                new User(2,"Name 2"),
-                new User(3,"Name 3"),
-                new User(4,"Name 4")
-        ));
+		User user1 = new User(1,"User 1");
+		User user2 = new User(2,"User 1");
+		User user3 = new User(3,"User 1");
+		User user4 = new User(4,"User 1");
+		
+        when(userRepository.findAll()).thenReturn(Arrays.asList(user1,user2,user3,user4));
 
         Pageable pageRequest = PageRequest.of(0, 4);
-        List<User> users = userService.getPage(pageRequest).getContent();
+        Page<User> users = userService.getPage(pageRequest);
 
-        assertEquals(users.size(), 4);
+        assertThat(users).contains(user1,user2,user3,user4);
+        assertEquals(users.getTotalElements(), 4);
 
         verify(userRepository).findAll();
 	}

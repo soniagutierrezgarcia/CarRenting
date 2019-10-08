@@ -1,5 +1,6 @@
 package com.springboot.app.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
@@ -7,7 +8,6 @@ import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import org.junit.Before;
@@ -19,6 +19,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
@@ -97,18 +98,20 @@ public class CarServiceImplTestCase {
 	 */
 	@Test
 	public void testGetPage() {
+
+		Car car1 = new Car(1,"Model 1","Brand 1");
+		Car car2 = new Car(2,"Model 2","Brand 2");
+		Car car3 = new Car(3,"Model 3","Brand 3");
+		Car car4 = new Car(4,"Model 4","Brand 4");
+		
 		       
-        when(carRepository.findAll()).thenReturn(Arrays.asList(
-                new Car(1,"Model 1","Brand 1"),
-                new Car(2,"Model 2","Brand 2"),
-                new Car(3,"Model 3","Brand 3"),
-                new Car(4,"Model 4","Brand 4")
-        ));
+        when(carRepository.findAll()).thenReturn(Arrays.asList(car1,car2,car3,car4));
 
         Pageable pageRequest = PageRequest.of(0, 4);
-        List<Car> cars = carService.getPage(pageRequest).getContent();
-
-        assertEquals(cars.size(), 4);
+        Page<Car> cars = carService.getPage(pageRequest);
+        
+        assertThat(cars).contains(car1,car2,car3,car4);
+        assertEquals(cars.getTotalElements(), 4);
 
         verify(carRepository).findAll();
         
