@@ -1,6 +1,8 @@
 package com.springboot.app.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -20,6 +22,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
@@ -100,20 +103,27 @@ public class UserServiceImplTestCase {
 
 	@Test
 	public void testGetPage() {
+
+        
 		User user1 = new User(1,"User 1");
 		User user2 = new User(2,"User 1");
 		User user3 = new User(3,"User 1");
 		User user4 = new User(4,"User 1");
-		
-        when(userRepository.findAll()).thenReturn(Arrays.asList(user1,user2,user3,user4));
 
-        Pageable pageRequest = PageRequest.of(0, 4);
-        Page<User> users = userService.getPage(pageRequest);
+		Pageable pageRequest = PageRequest.of(0, 4); 
+		//Tenemos que crear el mock de la petición paginada (que devuelve página, no lista)
+		when(userRepository.findAll(pageRequest))
+		.thenReturn(new PageImpl<>(Arrays.asList(user1, user2, user3, user4), pageRequest, 4));
 
-        assertThat(users).contains(user1,user2,user3,user4);
-        assertEquals(users.getTotalElements(), 4);
+		Page<User> users = userService.getPage(pageRequest);
 
-        verify(userRepository).findAll();
+
+		assertThat("We have 4 users", users.getContent().size(), is(equalTo(4)));
+		assertThat(users.getContent()).contains(user1, user2, user3, user4);
+		verify(userRepository, times(1)).findAll(pageRequest);
+
+       
+        
 	}
 
 }

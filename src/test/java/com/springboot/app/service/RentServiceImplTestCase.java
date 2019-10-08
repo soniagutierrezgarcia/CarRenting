@@ -21,6 +21,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
@@ -113,25 +114,28 @@ public class RentServiceImplTestCase {
     }
 
 	@Test
-	public void testGetByUserPageableUser() {        
+	public void testGetByUserPageableUser() {  
+		
+		
 		Car carFind = new Car(1,"Model 1","Brand 1");
 		LocalDate starDate = LocalDate.of(2019, 02, 01);
 		LocalDate endDate = LocalDate.of(2019, 02, 01);
 		User user = new User(1, "User 1");
+		Pageable pageRequest = PageRequest.of(0, 4); 
 		
-		when(rentRepository.findByUser(user)).thenReturn(Arrays.asList(
+		when(rentRepository.findByUser(pageRequest, user)).thenReturn(new PageImpl<>(Arrays.asList(
 				new Rent(1, user, carFind, starDate, endDate, 100.0),
 				new Rent(2, user, carFind, starDate, endDate, 200.0),
 				new Rent(3, user, carFind, starDate, endDate, 300.0),
 				new Rent(4, user, carFind, starDate, endDate, 400.0)
-    ));
+    ), pageRequest, 4));
 
-    Pageable pageRequest = PageRequest.of(0, 4);
+
     Page<Rent> rents = rentService.getByUser(pageRequest, user);
 
     assertEquals(rents.getTotalElements(), 4);
 
-    verify(rentRepository).findByUser(user);
+    verify(rentRepository).findByUser(pageRequest, user);
     
 	}
 
@@ -159,24 +163,22 @@ public class RentServiceImplTestCase {
 
 	@Test
 	public void testGetByCarPageableCar() {
+				
 		Car car = new Car(1,"Model 1","Brand 1");
 		LocalDate starDate = LocalDate.of(2019, 02, 01);
 		LocalDate endDate = LocalDate.of(2019, 02, 01);
 		User user = new User(1, "User 1");
+		Rent rent1 = new Rent(1, user, car, starDate, endDate, 100.0);
+		Rent rent2 = new Rent(2, user, car, starDate, endDate, 50.0);
+		Pageable pageRequest = PageRequest.of(0, 2); 
 		
-		when(rentRepository.findByCar(car)).thenReturn(Arrays.asList(
-				new Rent(1, user, car, starDate, endDate, 100.0),
-				new Rent(2, user, car, starDate, endDate, 200.0),
-				new Rent(3, user, car, starDate, endDate, 300.0),
-				new Rent(4, user, car, starDate, endDate, 400.0)
-    ));
+	
+		when(rentRepository.findByCar(pageRequest, car)).thenReturn(new PageImpl<>(Arrays.asList(rent1,rent2), pageRequest, 2));
 
-    Pageable pageRequest = PageRequest.of(0, 4);
-    Page<Rent> rents = rentService.getByCar(pageRequest, car);
+		Page<Rent> rents = rentService.getByCar(pageRequest, car);
 
-    assertEquals(rents.getTotalElements(), 4);
+		assertEquals(rents.getTotalElements(), 2);
 
-    verify(rentRepository).findByCar(car);
 	}
 
 	@Test
@@ -192,7 +194,7 @@ public class RentServiceImplTestCase {
 
     List<Rent> rents = rentService.getByCar(car);
 
-    assertEquals(rents.size(), 4);
+    assertEquals(rents.size(), 2);
 
     verify(rentRepository).findByCar(car);
 	}
@@ -207,14 +209,15 @@ public class RentServiceImplTestCase {
 		Rent rent = new Rent(1, user, car, starDate, endDate, 100.0);
 		Rent rent2 = new Rent(2, user, car, starDate, endDate, 50.0);
 		
-        when(rentRepository.findById(1)).thenReturn(Optional.of(rent));
         when(rentRepository.findByCarAndStartDateGreaterThanEqualAndEndDateLessThanEqual(car, starDate, endDate)).thenReturn(Arrays.asList(rent, rent2));
 	
         List<Rent> rents = rentService.getByCarAndDateRange(car,starDate , endDate);
         
-        Mockito.verify(rentService, times(1)).getByCarAndDateRange(car, starDate, endDate);
-        
         assertEquals(rents.size(), 2);
+        
+//        Mockito.verify(rentService).getByCarAndDateRange(car, starDate, endDate);
+        
+
 	}
 
 }

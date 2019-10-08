@@ -20,6 +20,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
@@ -99,21 +100,22 @@ public class CarServiceImplTestCase {
 	@Test
 	public void testGetPage() {
 
-		Car car1 = new Car(1,"Model 1","Brand 1");
-		Car car2 = new Car(2,"Model 2","Brand 2");
-		Car car3 = new Car(3,"Model 3","Brand 3");
-		Car car4 = new Car(4,"Model 4","Brand 4");
-		
-		       
-        when(carRepository.findAll()).thenReturn(Arrays.asList(car1,car2,car3,car4));
+		Car car1 = new Car(1, "Model 1", "Brand 1");
+		Car car2 = new Car(2, "Model 2", "Brand 2");
+		Car car3 = new Car(3, "Model 3", "Brand 3");
+		Car car4 = new Car(4, "Model 4", "Brand 4");
 
-        Pageable pageRequest = PageRequest.of(0, 4);
-        Page<Car> cars = carService.getPage(pageRequest);
-        
-        assertThat(cars).contains(car1,car2,car3,car4);
-        assertEquals(cars.getTotalElements(), 4);
+		Pageable pageRequest = PageRequest.of(0, 4); 
+		//Tenemos que crear el mock de la petición paginada (que devuelve página, no lista)
+		when(carRepository.findAll(pageRequest))
+		.thenReturn(new PageImpl<>(Arrays.asList(car1, car2, car3, car4), pageRequest, 4));
 
-        verify(carRepository).findAll();
+		Page<Car> cars = carService.getPage(pageRequest);
+
+		//Comprobamos que tenemos 4 coches, y que son los 4 que queríamos
+		assertThat("We have 4 cars", cars.getContent().size(), is(equalTo(4)));
+		assertThat(cars.getContent()).contains(car1, car2, car3, car4);
+		verify(carRepository, times(1)).findAll(pageRequest);
         
 	}
 
